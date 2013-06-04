@@ -53,6 +53,7 @@ $\Omega$是平面里面的一个封闭物体。我们离散化变量$x$：$x_{I}
 \end{equation}
 
 \section{快速行进法}
+\subsection{数学证明}
 快速行进法（Fast Marching Method, FMM）是由Sethian在1996年提出的，用来求解从已知边界向内部演化的过程。它以某种方式记录了物体边界向前行进的信息。
 \begin{figure}[h!]
     \centering
@@ -186,5 +187,100 @@ $A^n \cup F^n$的补集就被成为未知区域，因为这些点在第$n$步到
 
 算法结束。
 
+\subsection{伪代码}
+这里我们考虑方程\ref{eikonal_equation_1}的特殊情况：$a = 1$，即
+\begin{equation}
+    \label{special_eikonal_equation}
+    \left| \nabla u(x) \right| = 1
+\end{equation}
+其中$u = 0$在物体的边界上。这个时候的$u$是物体边缘到内部点的距离的很好的近似。
+快速行进法在算法上很容易实现，对于每一个2D网格点或者坐标为$(i, j)$的像素点，我们存储它的距离变换的浮点数值$T_{ij}$和一个标志$f_{ij}$。这个标志可能有三个值：
+\begin{itemize}
+\item BAND： 表示点属于当前的前锋点集或者说窄带（$F^n$），他的$T$值依然在变化中。
+\item INSIDE： 表示点在移动前锋内部的未知点集，它的$T$值目前未知。
+\item KNOWN： 表示点在移动前锋后面（已知点集$A^n$），它的$T$值已知。
+\end{itemize}
+
+初始化如代码\ref{fmm_init_code}所示，MAX\_VALUE表示比任何可能的$T$都要大的值，比如说$10^6$。
+\begin{lstlisting}[
+    language={C},
+    caption={快速行进法初始化代码},
+    label={fmm_init_code},
+]
+for all points (i,j)
+{
+    if ((i,j) on initial boundary)
+    {
+        f(i,j)=BAND; T(i,j)=0;
+        add (i,j) to NarrowBand;
+    }
+    else if ((i,j) inside boundary)
+    {
+        f(i,j)=INSIDE; T(i,j)=MAX_VALUE;
+    }
+    else /* (i,j) outside boundary */
+    {
+        f(i,j)=KNOWN; T(i,j)=0;
+　　}
+}
+\end{lstlisting}
+
+演化时，我们将方程\ref{special_eikonal_equation}离散近似为：
+\begin{equation}
+    \label{discretized_eikonal_equation}
+    \max(D^{-x}T, -D^{+x}T, 0)^2 + \max(D^{-y}T, -D^{+y}T, 0)^2 = 1
+\end{equation}
+其中$D^{-x}T(i, j) = T(i, j) - T(i - 1, j)$，并且$D^{+x}T(i, j) = T(i + 1, j) - T(i, j)$，$y$轴方向类似。方程\ref{special_eikonal_equation}可以由循环在每个网格点求解方程\ref{discretized_eikonal_equation}得到结果，对于$N$个网格点时间复杂度是$O(N^2)$。如代码\ref{fmm_iteration_code}所示。
+\begin{lstlisting}[
+    language={C},
+    caption={快速行进法迭代代码},
+    label={fmm_iteration_code},
+]
+while (NarrowBand not empty)
+{
+    P(i,j)=head(NarrowBand); 						/* STEP 1 */
+    remove P from NarrowBand;
+    f(i,j)=KNOWN;
+    for point (k,l) in {(i−1,j),(i,j−1),(i+1,j),(i,j+1)}
+        if (f(k,l)!=KNOWN)
+        {
+            if (f(k,l)==INSIDE) f(k,l)=BAND; 	    /* STEP 2 */
+            sol=MAX_VALUE; 							/* STEP 3 */
+            solve(k−1,l,k,l−1,sol);
+            solve(k+1,l,k,l−1,sol);
+            solve(k−1,l,k,l+1,sol);
+            solve(k+1,l,k,l+1,sol);
+            T(k,l)=sol;
+            insert (k,l) in NarrowBand; 			/* STEP 4 */
+        }
+}
+
+solve(int i1,int j1,int i2,int j2,float& sol)
+{
+    float r,s;
+    if (f(i1,j1)==KNOWN)
+        if (f(i2,j2)==KNOWN)
+        {
+            r = sqrt((2−(T(i1,j1)−T(i2,j2))*(T(i1,j1)−T(i2,j2)));
+            s = (T(i1,j1)+T(i2,j2)−r)/2;
+            if (s>=T(i1,j1) && s>=T(i2,j2)) sol=min(sol,s);
+            else
+            {
+                s += r;
+                if (s>=T(i1,j1) && s>=T(i2,j2)) sol=min(sol,s);
+            }
+        }
+        else sol=min(sol,1+T(i1,j1));
+    else if (f(i2,j2)==KNOWN) sol=min(sol,1+T(i1,j2));
+}
+\end{lstlisting}
+
 \section{增强快速行进法}
+快速行进法计算的是内部点到边界的距离，这里介绍一下增强的快速行进法用来产生骨架。图表\ref{skel_overview}概述了算法应用到一个锯齿状矩形的整个过程。很容易想到骨架点总是由紧凑的边界段在前锋行进时重合产生的。这个方法的重点就在于确定每一个行进前锋上的点是由边界上哪个点得来，为了实现这个目的，我们为每个网格点新增了一个实数属性$U$。初始化时，我们选取任意一个边界点，设置$U=0$，从这个点开始，我们为每个边界点设置一个单调递增的$U$值，这个$U$值等于这个点沿边界到初始点的长度。所以U是边界上两点沿边界的距离参数化的结果。有个例外就是$U$在各自的连通边界上开始演化，这个我们后面再讲。
+\begin{figure}[h!]
+    \centering
+    \includegraphics[height=200bp]{figure/skel_overview.png}
+    \caption{骨架提取算法预览}
+    \label{skel_overview}
+\end{figure}
 
