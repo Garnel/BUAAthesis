@@ -1,8 +1,8 @@
 paper:
-	xelatex 39211522毛光明毕业论文.tex
-	-bibtex 39211522毛光明毕业论文.aux
-	xelatex 39211522毛光明毕业论文.tex
-	xelatex 39211522毛光明毕业论文.tex
+	xelatex paper.tex
+	-bibtex paper.aux
+	xelatex paper.tex
+	xelatex paper.tex
 
 clean:
 	find . -name '*.aux' -print0 | xargs -0 rm -rf
