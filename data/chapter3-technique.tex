@@ -137,10 +137,10 @@ $A^n \cup F^n$的补集就被成为未知区域，因为这些点在第$n$步到
     \left\{
     \begin{aligned}
     & t_0 & = & 0 \\
-    & A^0 & = & \{I \in Z^2, x_I \notin \Omega}
+    & A^0 & = & \{I \in Z^2, x_I \notin \Omega} \\
     & u^0_I = \left\{
         \begin{aligned}
-        & 0 & I \in A^0
+        & 0 & I \in A^0 \\
         & +\infty & I \notin A^0
         \end{aligned}
         \right.
@@ -149,3 +149,42 @@ $A^n \cup F^n$的补集就被成为未知区域，因为这些点在第$n$步到
 \end{equation*}
 
 从第$n$步到第$n+1$步，我们假设$t_n, A^n, u^n$都已知。
+
+首先，我们计算时间的候选值$\widetilde{u}^n_I$，对于每一个$I \in F^n$，找到$\widetilde{u}^n_I$的唯一解：
+\begin{equation*}
+    \label{uI_unique}
+    0 = S_I(\widetilde{u}^n_I, \{u^n_J\}_{J \in V^*(I)}), \mbox{其中} V^*(I) = V(I) \setminus \{I\}
+\end{equation*}
+
+然后，取最小的候选值。
+\begin{equation*}
+    \label{min_tn+1}
+    t_{n+1} = \underset{I \in F^n}{\inf} \widetilde{u}^n_I
+\end{equation*}
+
+最后，更新点集和各个函数值。新的已知点集为
+\begin{equation*}
+    \label{new_an+1}
+    NA^{n+1} = \{I \in F^n, \widetilde{u}^n_I = t_n\}
+\end{equation*}
+可得
+\begin{equation*}
+    \label{new_values}
+    \left\{
+    \begin{aligned}
+    & t_{n+1},\\
+    & A^{n+1} & = & A^n \cup NA^{n+1}, \\
+    & u^{n+1}_I & = & \left\{
+        \begin{aligned}
+        & t_{n+1} & I \in NA^n \\
+        & u^n_I & \mbox{其他}
+        \end{aligned}
+        \right.
+    \end{aligned}
+    \right.
+\end{equation*}
+
+算法结束。
+
+\section{增强快速行进法}
+
