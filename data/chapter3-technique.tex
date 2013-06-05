@@ -276,11 +276,55 @@ solve(int i1,int j1,int i2,int j2,float& sol)
 \end{lstlisting}
 
 \section{增强快速行进法}
-快速行进法计算的是内部点到边界的距离，这里介绍一下增强的快速行进法用来产生骨架。图表\ref{skel_overview}概述了算法应用到一个锯齿状矩形的整个过程。很容易想到骨架点总是由紧凑的边界段在前锋行进时重合产生的。这个方法的重点就在于确定每一个行进前锋上的点是由边界上哪个点得来，为了实现这个目的，我们为每个网格点新增了一个实数属性$U$。初始化时，我们选取任意一个边界点，设置$U=0$，从这个点开始，我们为每个边界点设置一个单调递增的$U$值，这个$U$值等于这个点沿边界到初始点的长度。所以U是边界上两点沿边界的距离参数化的结果。有个例外就是$U$在各自的连通边界上开始演化，这个我们后面再讲。
+快速行进法计算的是内部点到边界的距离，这里介绍一下增强的快速行进法用来产生骨架。图表\ref{skel_overview}概述了算法应用到一个锯齿状矩形的整个过程。
 \begin{figure}[h!]
     \centering
     \includegraphics[height=200bp]{figure/skel_overview.png}
     \caption{骨架提取算法预览}
     \label{skel_overview}
 \end{figure}
+很容易想到骨架点总是由紧凑的边界段在前锋行进时重合产生的。这个方法的重点就在于确定每一个行进前锋上的点是由边界上哪个点得来，为了实现这个目的，我们为每个网格点新增了一个实数属性$U$。初始化时，我们选取任意一个边界点，设置$U=0$，从这个点开始，我们为每个边界点设置一个单调递增的$U$值，这个$U$值等于这个点沿边界到初始点的长度。所以$U$是边界上两点沿边界的距离参数化的结果。有个例外就是$U$在各自的连通边界上开始演化，这个我们后面再讲。
 
+初始化后，$U$和$T$一起演化（图片\ref{skel_overview}）。我们在步骤2的演化代码（代码\ref{fmm_iteration_code}）中加了一些语句来实现这步，如代码\ref{afmm_step2}。
+\begin{lstlisting}[
+    language={C},
+    caption={增强快速行进法增加的代码},
+    label={afmm_step2},
+]
+… original FMM code …
+If (f(k, l) == INSIDE)	/* STEP 2*/
+{
+	F(k, l) = BAND;
+	a = average of U over KNOWN neighbors of (k, l);
+	m = min of U over KNOWN neighbors of (k, l);
+	M = max if U over KNOWN neighbors of (k, l);
+	If (M – m < 2) U(k, l) = a; else U(k, l) = U(i, j);
+}
+… original FMM code
+\end{lstlisting}
+
+在$U$的演化过程中，将初始边界内部的像素点的$U$值标记为到达这个点的边界点的U值。对于初始边界像素点中间的边界点我们使用平均法进行插值计算$U$值。这在边界段是凹面，向前行进边界会变长的时候发生。然而，如果当前点的$U$值相差大于2，这意味着他们在边界上的原点不是相邻点，因为边界上相邻点之间的距离最大为$\sqrt2$，如图\ref{neighbor_distance}里面斜对角的两个点。
+\begin{figure}[h!]
+    \centering
+    \includegraphics[height=70bp]{figure/neighbor_distance.png}
+    \caption{相邻点距离}
+    \label{neighbor_distance}
+\end{figure}
+以上情况发生在凸的边界段，它们在前锋行进的时候会发生重合。这时，我们就发现了一个骨架点，不用计算$U$的平均值，我们只需要选取其中一个相邻点的$U$值继续演化下去即可。图片\ref{afmm_details}有增强快速行进法的举例说明，例子中计算了一个矩形的骨架。
+\begin{figure}[h!]
+    \centering
+    \includegraphics[height=180bp]{figure/afmm_details.png}
+    \caption{增强快速行进法的执行细节}
+    \label{afmm_details}
+\end{figure}
+图中b部分展示了前三个带有$U$值的窄带，他们和矩形的边是平行的，这时没有骨架分支出现，前锋上的U值和边界上是一样的，也就是说，相邻点之间$U$差值为1。然而，在骨架分支上，这个差值离边界越远会变得越大，图中c的3D图像表明了这点。
+
+在前面提到过，$U$在上递增地进行参数化时，这个起点位置的$U$不再是边界上两点沿边界的距离参数化的结果，他与该边界上最大的$U$是挨着的，但是$U$的差值却是最大的。对于图片\ref{special_points}，有3个这样的点，相应就有3个不连通的边界段。图片\ref{special_points}展示了初始的$U$值，和数字编号，并使用了彩色进行标注（蓝色代表低值，红色代表高值，打印版可能只剩下灰度）。根据上面说的，这个$U$域有3个假的不连续的地方，如图片中的c。骨架（图中的d）就会得到3个假分支，就是那3个垂直指向边界的分支。
+\begin{figure}[h!]
+    \centering
+    \includegraphics[height=250bp]{figure/special_points.png}
+    \caption{特殊点的处理：原始物体(a)，初始$U$(b)，计算出来的$U$(c)，骨架(d)}
+    \label{special_points}
+\end{figure}
+
+移除这些假分支很容易，我们执行增强快速行进法两次，并且从不同的边界位置开始初始化$U$值。比如说，最小的y坐标值对应最大的y坐标值的点。下一步，我们对两个骨架求交集来移除假分支。这种方法在我们所有的测试用例中都生成了正确的骨架。
