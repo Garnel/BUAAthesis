@@ -1,5 +1,6 @@
 % !Mode:: "TeX:UTF-8"
 \chapter{相关原理与技术}
+\label{technique}
 
 \section{程函方程}
 程函方程是当使用WKB理论来近似波动方程时在波动传播问题中碰到的非线性偏微分方程。它从电磁学的麦克斯韦尔方程组导出，并在物理 (波动)光学和几何 (射线)光学之间起连接作用。
@@ -277,6 +278,7 @@ solve(int i1,int j1,int i2,int j2,float& sol)
 \end{lstlisting}
 
 \section{增强快速行进法}
+\label{section-afmm}
 快速行进法计算的是内部点到边界的距离，这里介绍一下增强的快速行进法用来产生骨架。图表\ref{skel_overview}概述了算法应用到一个锯齿状矩形的整个过程。
 \begin{figure}[h!]
     \centering
