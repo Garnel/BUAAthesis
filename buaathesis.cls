@@ -797,7 +797,7 @@ The LaTeX template for thesis of BUAA]
         毕业设计(论文)时间：~~\ulinec[.1]{\buaa@thesisbeginyear}年\ulinec[.06]{\buaa@thesisbeginmonth}月\ulinec[.06]{\buaa@thesisbeginday}日至\ulinec[.1]{\buaa@thesisendyear}年\ulinec[.06]{\buaa@thesisendmonth}月\ulinec[.06]{\buaa@thesisendday}日 \\
         答辩时间：\ulinec[.16]{\buaa@defenseyear}年\ulinec[.08]{\buaa@defensemonth}月\ulinec[.08]{\buaa@defenseday}日 \\
         成\qquad 绩：\ulinec[.3]{} \\
-        指导教师：\ulinec[.3]{} \\
+        指导教师：\ulinec[.3]{\buaa@teacher} \\
         兼职教师或答疑教师（并指出所负责部分）：\\
         \ulinel{}
         \ulinel{}

@@ -1,12 +1,16 @@
 % !Mode:: "TeX:UTF-8"
 \begin{cabstract}
-随着医学和计算机图像图形学的发展，传统的内窥镜技术正逐渐被可以无损检测的虚拟内窥镜技术所取代。而想要快速准确地进行大肠虚拟漫游，一个首要步骤是提取大肠模型的中心路径以指导视点移动。
+随着医学和计算机图像图形学的发展，传统的内窥镜技术正逐渐被可以无损检测的虚拟内窥镜技术所取代。而想要快速准确地进行大肠虚拟漫游，一个首要步骤是提取大肠模型的中心路径以指导视点移动。传统的中心路径提取算法要么实现复杂，要么效率低下，很难满足实际应用需求。
 
-本文主要针对大肠中心路径提取算法进行了研究，并且在快速行进法的基础上成功提取了大肠的中心路径。首先将网格数据体素化，然后在3个坐标轴方向对生成的大肠体数据进行切片，对每一个切片通过增强的快速行进法提取二维的骨架，最后将3个轴相对应的三个骨架群求交集得到最终的中心路径。
+针对这个问题，本文对高效易实现的三维物体中心路径提取算法进行了研究，并且在增强快速行进法的基础上给出了一种具体实现，首先，将三维物体模型的网格数据体素化，然后在3个坐标轴方向对生成的体数据进行切片，对每一个切片通过增强快速行进法提取二维的骨架，最后将3个轴相对应的三个骨架群求交集得到最终的中心路径。在实际应用过程中，该算法能在十秒级的时间内成功提取良好的三维物体中心路径，并且本文给出的C++实现核心代码量在千行以内，算法易实现。
+
+本文在增强快速行进法基础上实现了一种三维物体中心路径提取算法，该算法效率高并且易于实现，有很广阔的应用前景。
 \end{cabstract}
 
 \begin{eabstract}
-With the development of medicine and computer graphics, the traditional endoscope technology is gradually replaced by virtual endoscopy techniques for nondestructive diagnosis. However to perform a virtual roaming in intestine accurately, the first step is to extract the centerline of the intestine model to guide viewpoints.
+With the development of medicine and computer graphics, the traditional endoscope technology is gradually replaced by virtual endoscopy techniques for nondestructive diagnosis. However to perform a virtual roaming in intestine accurately, the first step is to extract the centerline of the intestine model to guide viewpoints. Traditional centerline extraction algorithms are either complex to implement or slow, and can not meet the demand of practical application.
 
-The paper focuses on 3D centerline of the intestine's extraction algorithm and its implementation based on fast marching method. First, voxelize the mesh data, then, slice the generated volume file of the intestine in three axis directions and skeletonization each slice. At last, intersect the three skeleton sets to get the centerline.
+Aiming at this problem, in the paper, an efficient and easy to implement extraction algorithm is studied and implemented based on the augmented fast marching method. First, voxelize the mesh data, then, slice the generated volume file of the intestine in three axis directions and skeletonization each slice. At last, intersect the three skeleton sets to get the centerline. In practical applications, the algorithm can successfully generate 3D centerline at ten-seconds level, and the core code of the C++ implementation given in the paper has less than 1000 lines, it is very easy to implement.
+
+In this paper, an 3D centerline extraction algorithm based on augmented fast marching method is presented which is fast and easy to implement. It has a very broad application prospects.
 \end{eabstract}
