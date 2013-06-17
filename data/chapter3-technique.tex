@@ -40,13 +40,13 @@ $\Omega$是平面里面的一个封闭物体。离散化变量$x$：$x_{I} = I\D
 
 其中，$V(I) = \{J \in Z^{2}, \left| J - I \right| \leq 1\}$，也就是说$V(I)$是点$I$在平面网格上的相邻5点（看）。于是有了
 \begin{equation*}
-    \label{eikonal_equation_3}
+    \label{eikonal_equation_4}
     V(I) = \{I, I^{1, +}, I^{1, -}, I^{2, +}, I^{2, -}\} \mbox{ 其中 } I^{\alpha, \pm}  = I \pm e_{\alpha}, \alpha = 1, 2
 \end{equation*}
 
 推荐使用Rouy-Tourin格式
 \begin{equation}
-    \label{eikonal_equation_3}
+    \label{rouy-tourin-scheme}
     \begin{aligned}
     & -a(x_I) + \sqrt{(\max(0, \frac{u_I - u_{I^{1, -}}}{\Delta x}, \frac{u_I - u_{I^{1, +}}}{\Delta x}))^2 + (\max(0, \frac{u_I - u_{I^{1, -}}}{\Delta x}, \frac{u_I - u_{I^{1, +}}}{\Delta x}))^2} \\
     & := S_I(u_I, u_{I^{1, -}}, u_{I^{1, +}}, u_{I^{2, -}}, u_{I^{2, +}}) := S_I[u]
@@ -103,7 +103,7 @@ $A^n \cup F^n$的补集就被成为未知区域，因为这些点在第$n$步到
 \end{equation*}
 这些点就是新的已知点。也就是说
 \begin{equation*}
-    \label{tn+1}
+    \label{another-tn+1}
     A^{n+1} \setminus A^n = \{ I \in F^n, \widetilde{u}^n_I = t_{n+1}\}
 \end{equation*}
 这恰好就解释了函数$u$的值就是从$\Omega$边界到达点$x_I$所花费的最短时间。定义新的$u^{n+1}$
@@ -322,11 +322,11 @@ If (f(k, l) == INSIDE)	/* STEP 2*/
 \end{figure}
 图中b部分展示了前三个带有$U$值的窄带，他们和矩形的边是平行的，这时没有骨架分支出现，前锋上的U值和边界上是一样的，也就是说，相邻点之间$U$差值为1。然而，在骨架分支上，这个差值离边界越远会变得越大，图中c的3D图像表明了这点。
 
-在前面提到过，$U$在上递增地进行参数化时，这个起点位置的$U$不再是边界上两点沿边界的距离参数化的结果，他与该边界上最大的$U$是挨着的，但是$U$的差值却是最大的。对于图片\ref{special_points}，有3个这样的点，相应就有3个不连通的边界段。图片\ref{special_points}展示了初始的$U$值，和数字编号，并使用了彩色进行标注（蓝色代表低值，红色代表高值，打印版可能只剩下灰度）。根据上面说的，这个$U$域有3个假的不连续的地方，如图片中的c。骨架（图中的d）就会得到3个假分支，就是那3个垂直指向边界的分支。
+在前面提到过，$U$在上递增地进行参数化时，这个起点位置的$U$不再是边界上两点沿边界的距离参数化的结果，他与该边界上最大的$U$是挨着的，但是$U$的差值却是最大的。对于图片\ref{special_points}，有3个这样的点，相应就有3个不连通的边界段。图片\ref{special_points}展示了初始的$U$值，和数字编号，并使用了彩色进行标注（蓝色代表低值，红色代表高值）。根据上面说的，这个$U$域有3个假的不连续的地方，如图片中的b。骨架（图中的c）就会得到3个假分支，就是那3个垂直指向边界的分支。
 \begin{figure}[h!]
     \centering
-    \includegraphics[height=250bp]{figure/special_points.png}
-    \caption{特殊点的处理：原始物体(a)，初始$U$(b)，计算出来的$U$(c)，骨架(d)}
+    \includegraphics[width=400bp]{figure/special_points.png}
+    \caption{特殊点的处理：原始物体(a)，计算出来的$U$(b)，骨架(c)}
     \label{special_points}
 \end{figure}
 
