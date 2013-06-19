@@ -240,40 +240,40 @@ for all points (i,j)
 ]
 while (NarrowBand not empty)
 {
-    P(i,j)=head(NarrowBand); 						/* STEP 1 */
+    P(i, j)=head(NarrowBand); 						/* STEP 1 */
     remove P from NarrowBand;
-    f(i,j)=KNOWN;
-    for point (k,l) in {(i−1,j),(i,j−1),(i+1,j),(i,j+1)}
-        if (f(k,l)!=KNOWN)
+    f(i, j)=KNOWN;
+    for point (k, l) in {(i − 1, j), (i,j − 1), (i + 1,j), (i, j + 1)}
+        if (f(k, l) != KNOWN)
         {
-            if (f(k,l)==INSIDE) f(k,l)=BAND; 	    /* STEP 2 */
-            sol=MAX_VALUE; 							/* STEP 3 */
-            solve(k−1,l,k,l−1,sol);
-            solve(k+1,l,k,l−1,sol);
-            solve(k−1,l,k,l+1,sol);
-            solve(k+1,l,k,l+1,sol);
-            T(k,l)=sol;
-            insert (k,l) in NarrowBand; 			/* STEP 4 */
+            if (f(k, l) == INSIDE) f(k, l) = BAND; 	/* STEP 2 */
+            sol=MAX\_VALUE; 						/* STEP 3 */
+            solve(k − 1, l, k, l − 1, sol);
+            solve(k + 1, l, k, l − 1, sol);
+            solve(k − 1, l, k, l + 1, sol);
+            solve(k + 1, l, k, l + 1, sol);
+            T(k, l) = sol;
+            insert (k, l) in NarrowBand; 			/* STEP 4 */
         }
 }
 
 solve(int i1,int j1,int i2,int j2,float& sol)
 {
-    float r,s;
-    if (f(i1,j1)==KNOWN)
-        if (f(i2,j2)==KNOWN)
+    float r, s;
+    if (f(i1, j1) == KNOWN)
+        if (f(i2, j2) == KNOWN)
         {
-            r = sqrt((2−(T(i1,j1)−T(i2,j2))*(T(i1,j1)−T(i2,j2)));
-            s = (T(i1,j1)+T(i2,j2)−r)/2;
-            if (s>=T(i1,j1) && s>=T(i2,j2)) sol=min(sol,s);
+            r = sqrt((2 − (T(i1, j1) − T(i2, j2))*(T(i1, j1) − T(i2, j2)));
+            s = (T(i1, j1) + T(i2, j2) − r)/2;
+            if (s >= T(i1, j1) && s >= T(i2, j2)) sol = min(sol, s);
             else
             {
                 s += r;
-                if (s>=T(i1,j1) && s>=T(i2,j2)) sol=min(sol,s);
+                if (s >= T(i1, j1) && s >= T(i2, j2)) sol = min(sol, s);
             }
         }
-        else sol=min(sol,1+T(i1,j1));
-    else if (f(i2,j2)==KNOWN) sol=min(sol,1+T(i1,j2));
+        else sol = min(sol, 1 + T(i1, j1));
+    else if (f(i2, j2) == KNOWN) sol = min(sol, 1 + T(i1, j2));
 }
 \end{lstlisting}
 
